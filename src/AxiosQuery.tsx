@@ -26,20 +26,39 @@ interface DataType {
 }
 
 const AxiosQuery = () => {
-  const {data,isError,error,isLoading} = useQuery<DataType[], Error>("axios-query",async()=>{
-    const response = await axios.get(
-      "https://jsonplaceholder.typicode.com/users"
-    );
-    return response.data 
-  })
-  if(isLoading){
-    <div>Loading..</div>
+  const { data, isError, error, isLoading, isFetching } = useQuery<
+    string[],
+    Error
+  >(
+    ["axios-query"],
+    async () => {
+      const response = await axios.get(
+        "https://jsonplaceholder.typicode.com/users"
+      );
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        console.log("데이터 요청 성공:", data);
+      },
+      select: (data) => {
+        const filter = data.map(({name}) => name); // ✅ 이것도 OK
+        return filter;
+      },
+    }
+  );
+  if (isLoading) {
+    <div>Loading..</div>;
   }
-  if(isError){
-    <div>{error.message}</div>
+  if (isError) {
+    <div>{error.message}</div>;
   }
+
   return (
     <div>
+      <div>
+        1
+      </div>
       {data?.map((item, idx) => (
         <div
           key={idx}
@@ -49,10 +68,7 @@ const AxiosQuery = () => {
             borderBottom: "1px solid blue",
           }}
         >
-          <p>{item.name}</p>
-          <p>{item.username}</p>
-          <p>{item.email}</p>
-          <p>{item.phone}</p>
+          {item}
         </div>
       ))}
     </div>
